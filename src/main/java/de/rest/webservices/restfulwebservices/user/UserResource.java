@@ -14,23 +14,31 @@ public class UserResource {
     @Autowired
     private UserDaoService userService;
 
-    @GetMapping(path = "/all-users")
+    @GetMapping(path = "/users")
     public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    @GetMapping(path = "/user/{id}")
+
+    @GetMapping(path = "/users/{id}")
     public User getUserBy(@PathVariable String id) {
         return userService.findByID(id);
     }
 
-    /*
-    @PostMapping(path = "/add-user")
+
+    @PostMapping(path = "/users")
     public ResponseEntity<Object> addUser(@RequestBody User user) {
 
         User newAddedUser = userService.addUser(user);
 
-        // ResponseEntity<Object>.created(location)
+        // Wir benutzen ServletUriComponentsBuilder um die URI http://asd.de:8080/users/X generisch zusammen zu stellen
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(newAddedUser.getId())
+                .toUri();
+
+        // Dadurch wird HTTP 201 mit der URI zurückgegeben. (201 bedeutet created.)
+        return ResponseEntity.created(location).build();
     }
-    */
 }
