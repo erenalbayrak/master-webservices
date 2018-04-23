@@ -1,6 +1,7 @@
 package de.rest.webservices.restfulwebservices.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -21,8 +22,12 @@ public class UserResource {
 
 
     @GetMapping(path = "/users/{id}")
-    public User getUserBy(@PathVariable String id) {
-        return userService.findByID(id);
+    public ResponseEntity<User> getUserBy(@PathVariable String id) {
+        User user = userService.findByID(id);
+        if (user != null) {
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } else
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
 
