@@ -1,5 +1,6 @@
 package de.rest.webservices.restfulwebservices.user;
 
+import de.rest.webservices.restfulwebservices.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ public class UserResource {
         if (user != null) {
             return new ResponseEntity<>(user, HttpStatus.OK);
         } else
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            throw new ResourceNotFoundException("User not found.");
     }
 
 
