@@ -28,9 +28,17 @@ public class UserResource {
         if (user != null) {
             return new ResponseEntity<>(user, HttpStatus.OK);
         } else
-            throw new ResourceNotFoundException("User not found.");
+            throw new ResourceNotFoundException("User not found with ID: " + id);
     }
 
+    @DeleteMapping(path = "/users/{id}")
+    public ResponseEntity<User> deleteUserBy(@PathVariable String id) {
+
+        if (userService.deleteByID(id)) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else
+            throw new ResourceNotFoundException("User not found with ID: " + id);
+    }
 
     @PostMapping(path = "/users")
     public ResponseEntity<Object> addUser(@RequestBody User user) {
