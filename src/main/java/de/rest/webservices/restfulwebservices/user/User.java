@@ -1,11 +1,17 @@
 package de.rest.webservices.restfulwebservices.user;
 
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 public class User {
 
     private String id;
+
+    @Size(min = 2, message = "Name muss mindestends 2 Zeichen lang sein.")
     private String name;
+
+    @Past
     private Date birthDate;
 
     // Ohne Default-Konstruktor HTTP 500 Error
