@@ -2,6 +2,8 @@ package de.rest.webservices.restfulwebservices.user;
 
 import de.rest.webservices.restfulwebservices.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +12,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
 public class UserResource {
@@ -22,21 +27,17 @@ public class UserResource {
         return userService.getAllUsers();
     }
 
-
     @GetMapping(path = "/users/{id}")
-    public ResponseEntity<User> getUserBy(@PathVariable String id) {
+    public ResponseEntity<Resource> getUserBy(@PathVariable String id) {
         User user = userService.findByID(id);
         if (user != null) {
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } else
-            throw new ResourceNotFoundException("User not found with ID: " + id);
-    }
 
-    @DeleteMapping(path = "/users/{id}")
-    public ResponseEntity<User> deleteUserBy(@PathVariable String id) {
+            // HATEOAS
+            Resource<User> resource = new Resource<>(user);
+            ControllerLinkBuilder link = linkTo(methodOn(this.getClass()).getAllUsers());
+            resource.add(link.withRel("all-users"));
 
-        if (userService.deleteByID(id)) {
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(resource, HttpStatus.OK);
         } else
             throw new ResourceNotFoundException("User not found with ID: " + id);
     }
@@ -55,5 +56,14 @@ public class UserResource {
 
         // Dadurch wird HTTP 201 mit der URI zurückgegeben. (201 bedeutet created.)
         return ResponseEntity.created(location).build();
+    }
+
+    @DeleteMapping(path = "/users/{id}")
+    public ResponseEntity<User> deleteUserBy(@PathVariable String id) {
+
+        if (userService.deleteByID(id)) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else
+            throw new ResourceNotFoundException("User not found with ID: " + id);
     }
 }
