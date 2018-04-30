@@ -38,12 +38,8 @@ public class UserDaoService {
 
     public boolean deleteByID(String id) {
         User user = users.stream()
-                .filter( x -> x.getId().equals(id) )
+                .filter(x -> x.getId().equals(id))
                 .findFirst().orElse(null);
-        if (user != null) {
-            users.remove(user);
-            return true;
-        } else
-            return false;
+        return user != null && users.remove(user);
     }
 }
