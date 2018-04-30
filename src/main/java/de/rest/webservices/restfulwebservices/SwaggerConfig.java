@@ -12,6 +12,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Links:
+ * http://localhost:8080/v2/api-docs
+ * http://localhost:8080/swagger-ui.html
+ * */
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
