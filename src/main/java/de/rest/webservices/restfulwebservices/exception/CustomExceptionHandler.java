@@ -21,7 +21,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 	// @TODO: Logging.
 
 	@ExceptionHandler(Exception.class)
-	public final ResponseEntity<Object> handleAllExceptions(Exception ex, WebRequest request) {
+	public final ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex) {
 
 		String uuid = UUID.randomUUID().toString();
 
@@ -30,7 +30,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
 		ErrorResponse errorResponse = new ErrorResponse(
 				"Interner Server-Fehler",
-				"Es ist ein Fehler aufgetretten." +
+				"Es ist ein Fehler aufgetretten. " +
 						"Für eine zukünftige Fehlerbehebung wurde dieses unerartete Verhalten des Servers unter folgendem Code gespeichert: " +
 						uuid);
 
