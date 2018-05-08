@@ -37,7 +37,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 				request.getDescription(false));
 		return new ResponseEntity<>(customException, HttpStatus.NOT_FOUND);
 	}
-	
+
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
@@ -47,5 +47,5 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 				"Validation Failed",
 				ex.getBindingResult().toString());
 		return new ResponseEntity<>(customException, HttpStatus.BAD_REQUEST);
-	}	
+	}
 }
