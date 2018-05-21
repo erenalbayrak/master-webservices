@@ -1,14 +1,17 @@
 package de.rest.webservices.restfulwebservices.user;
 
+import de.rest.webservices.restfulwebservices.user.entity_access.Post;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 // http://localhost:8080/h2-console
@@ -28,6 +31,10 @@ public class User {
     @ApiModelProperty(notes = "Birth date have to be in the past.")
     private Date birthDate;
 
+    @OneToMany(mappedBy = "user")
+    private List<Post> posts;
+
+
     // Ohne Default-Konstruktor HTTP 500 Error
     public User() {}
 
@@ -43,7 +50,6 @@ public class User {
             id = UUID.randomUUID().toString();
         }
     }
-
 
     public String getId() {
         return id;
@@ -67,5 +73,13 @@ public class User {
 
     public void setBirthDate(Date birthDate) {
         this.birthDate = birthDate;
+    }
+
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    public void setPosts(List<Post> posts) {
+        this.posts = posts;
     }
 }
