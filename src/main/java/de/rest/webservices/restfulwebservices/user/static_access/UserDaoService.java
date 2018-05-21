@@ -1,5 +1,6 @@
-package de.rest.webservices.restfulwebservices.user;
+package de.rest.webservices.restfulwebservices.user.static_access;
 
+import de.rest.webservices.restfulwebservices.user.User;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

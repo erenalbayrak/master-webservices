@@ -1,6 +1,7 @@
-package de.rest.webservices.restfulwebservices.user;
+package de.rest.webservices.restfulwebservices.user.entity_access;
 
 import de.rest.webservices.restfulwebservices.exception.ResourceNotFoundException;
+import de.rest.webservices.restfulwebservices.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
@@ -12,28 +13,30 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @RestController
-public class UserResource {
+public class UserJPAResource {
 
     @Autowired
-    private UserDaoService userService;
+    private UserRepository userRepository;
 
-    @GetMapping(path = "/users")
+    @GetMapping(path = "/jpa/users")
     public List<User> getAllUsers() {
-        return userService.getAllUsers();
+        return userRepository.findAll();
     }
 
-    @GetMapping(path = "/users/{id}")
+    @GetMapping(path = "/jpa/users/{id}")
     public ResponseEntity<Resource> getUserBy(@PathVariable String id) {
-        User user = userService.findByID(id);
-        if (user != null) {
 
+        Optional<User> user = userRepository.findById(id);
+
+        if (user.isPresent()) {
             // HATEOAS
-            Resource<User> resource = new Resource<>(user);
+            Resource<User> resource = new Resource<>(user.get());
             ControllerLinkBuilder link = linkTo(methodOn(this.getClass()).getAllUsers());
             resource.add(link.withRel("all-users"));
 
@@ -42,10 +45,10 @@ public class UserResource {
             throw new ResourceNotFoundException("User not found with ID: " + id);
     }
 
-    @PostMapping(path = "/users")
+    @PostMapping(path = "/jpa/users")
     public ResponseEntity<Object> addUser(@Valid @RequestBody User user) {
 
-        User newAddedUser = userService.addUser(user);
+        User newAddedUser = userRepository.save(user);
 
         // Wir benutzen ServletUriComponentsBuilder um die URI http://asd.de:8080/users/X generisch zusammen zu stellen
         URI location = ServletUriComponentsBuilder
@@ -58,12 +61,8 @@ public class UserResource {
         return ResponseEntity.created(location).build();
     }
 
-    @DeleteMapping(path = "/users/{id}")
-    public ResponseEntity<User> deleteUserBy(@PathVariable String id) {
-
-        if (userService.deleteByID(id)) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else
-            throw new ResourceNotFoundException("User not found with ID: " + id);
+    @DeleteMapping(path = "/jpa/users/{id}")
+    public void deleteUserBy(@PathVariable String id) {
+        userRepository.deleteById(id);
     }
 }
