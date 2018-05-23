@@ -24,6 +24,9 @@ public class UserJPAResource {
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * User-Entities:
+     * */
     @GetMapping(path = "/jpa/users")
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -64,5 +67,19 @@ public class UserJPAResource {
     @DeleteMapping(path = "/jpa/users/{id}")
     public void deleteUserBy(@PathVariable String id) {
         userRepository.deleteById(id);
+    }
+
+
+    /**
+     * Post-Entities:
+     * */
+    @GetMapping(path = "/jpa/users/{id}/posts")
+    public List<Post> getAllPostsFromUser(@PathVariable String id) {
+
+        Optional<User> user = userRepository.findById(id);
+        if (!user.isPresent())
+            throw new ResourceNotFoundException("User not found with ID: " + id);
+
+        return user.get().getPosts();
     }
 }

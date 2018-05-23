@@ -1,7 +1,10 @@
 package de.rest.webservices.restfulwebservices.exception;
 
+import lombok.Data;
+
 import java.util.Date;
 
+@Data
 public class ErrorLog {
 
     private String uuid;
@@ -15,20 +18,5 @@ public class ErrorLog {
         this.exceptionString = exception.toString();
         this.stackTrace = exception.getStackTrace();
     }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public Date getOccurTime() {
-        return occurTime;
-    }
-
-    public String getExceptionString() {
-        return exceptionString;
-    }
-
-    public StackTraceElement[] getStackTrace() {
-        return stackTrace;
-    }
 }
+

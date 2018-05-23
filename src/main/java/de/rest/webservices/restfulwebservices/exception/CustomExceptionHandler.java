@@ -3,58 +3,54 @@ package de.rest.webservices.restfulwebservices.exception;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.validation.ConstraintViolationException;
+import java.util.UUID;
 
 @ControllerAdvice
 @RestController
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
-	// @TODO: Logging.
+    // https://docs.oracle.com/javase/8/docs/api/java/lang/package-tree.html
+    @ExceptionHandler({
+            CloneNotSupportedException.class, InterruptedException.class, ClassNotFoundException.class,
+            IllegalAccessException.class, InstantiationException.class, NoSuchFieldException.class,
+            NoSuchMethodException.class, ArithmeticException.class, ArrayStoreException.class,
+            ClassCastException.class, EnumConstantNotPresentException.class, IllegalThreadStateException.class,
+            NumberFormatException.class, IllegalMonitorStateException.class, IllegalStateException.class,
+            ArrayIndexOutOfBoundsException.class, StringIndexOutOfBoundsException.class,
+            NegativeArraySizeException.class, NullPointerException.class, SecurityException.class,
+            TypeNotPresentException.class, UnsupportedOperationException.class
+    })
+    public final ResponseEntity<Object> handleInternalServerErrors(Exception ex) {
 
-	/*
-	@ExceptionHandler(Exception.class)
-	public final ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex) {
+        String uuid = UUID.randomUUID().toString();
 
-		String uuid = UUID.randomUUID().toString();
+        // @todo errorLog loggen. (Logstash, Kibana.)
+        // ErrorLog errorLog = new ErrorLog(uuid, ex);
 
-		// @TODO errorLog loggen
-		ErrorLog errorLog = new ErrorLog(uuid, ex);
+        ErrorMessage errorMessage = ErrorResponseCreator.buildErrorResponseByInternalError(uuid, ex);
+        return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
-		ErrorResponse errorResponse = new ErrorResponse(
-				"Interner Server-Fehler",
-				"Es ist ein Fehler aufgetretten. " +
-						"Für eine zukünftige Fehlerbehebung wurde dieses unerartete Verhalten des Servers unter folgendem Code gespeichert: " +
-						uuid);
 
-		return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
-	*/
+    @ExceptionHandler({ ConstraintViolationException.class, org.hibernate.exception.ConstraintViolationException.class })
+    public ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException ex) {
 
-	@Override
-	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-			HttpHeaders headers, HttpStatus status, WebRequest request) {
+        ErrorMessage errorMessage = ErrorResponseCreator.buildErrorResponseByConstraintViolation(ex);
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
 
-		List<String> errors = new ArrayList<>();
-		for (FieldError error : ex.getBindingResult().getFieldErrors()) {
-			errors.add(error.getField() + ": " + error.getDefaultMessage());
-		}
-		for (ObjectError error : ex.getBindingResult().getGlobalErrors()) {
-			errors.add(error.getObjectName() + ": " + error.getDefaultMessage());
-		}
-
-		ErrorResponse errorResponse = new ErrorResponse(
-				"Die übermittelten Daten sind fehlerhaft",
-				String.join("\n", errors));
-
-		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-	}
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+                                                                  HttpHeaders headers, HttpStatus status, WebRequest request) {
+        ErrorMessage errorMessage = ErrorResponseCreator.buildErrorResponseByValidationFail(ex);
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
 }

@@ -1,9 +1,12 @@
 package de.rest.webservices.restfulwebservices.user.entity_access;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.rest.webservices.restfulwebservices.user.User;
 
 import javax.persistence.*;
 
+// http://localhost:8080/h2-console
+// JDBC URL: jdbc:h2:mem:testdb
 @Entity
 public class Post {
 
@@ -13,6 +16,7 @@ public class Post {
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private User user;
 
 
