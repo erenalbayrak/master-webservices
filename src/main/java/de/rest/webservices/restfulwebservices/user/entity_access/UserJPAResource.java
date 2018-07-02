@@ -24,6 +24,9 @@ public class UserJPAResource {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PostRepository postRepository;
+
     /**
      * User-Entities:
      * */
@@ -81,5 +84,30 @@ public class UserJPAResource {
             throw new ResourceNotFoundException("User not found with ID: " + id);
 
         return user.get().getPosts();
+    }
+
+    @PostMapping(path = "/jpa/users/{id}/posts")
+    public ResponseEntity<Resource> addPost(@PathVariable String id, @RequestBody Post post) {
+
+        Optional<User> userOptional = userRepository.findById(id);
+
+        if (!userOptional.isPresent()) {
+            throw new ResourceNotFoundException("User not found with ID: " + id);
+        }
+
+        User user = userOptional.get();
+        post.setUser(user);
+
+        postRepository.save(post);
+
+        // Wir benutzen ServletUriComponentsBuilder um die URI http://asd.de:8080/users/X generisch zusammen zu stellen
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(post.getId())
+                .toUri();
+
+        // Dadurch wird HTTP 201 mit der URI zurückgegeben. (201 bedeutet created.)
+        return ResponseEntity.created(location).build();
     }
 }
